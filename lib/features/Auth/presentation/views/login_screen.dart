@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/core/theme/app_color.dart';
+import 'package:notes_app/features/Auth/data/services/auth_service.dart';
 import 'package:notes_app/features/Auth/presentation/manager/auth_visibility_cubit.dart';
+import 'package:notes_app/features/Auth/presentation/views/register_screen.dart';
+import 'package:notes_app/features/notes/presentation/views/create_note_screen.dart';
 import 'widgets/auth_primary_button.dart';
 import 'widgets/auth_shell.dart';
 import 'widgets/auth_text_field.dart';
 import 'widgets/auth_header.dart';
 import 'widgets/auth_footer.dart';
-import 'widgets/social_auth_row.dart'; // Reusing the one from Register
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.onRegisterTap});
-
-  final VoidCallback? onRegisterTap;
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
               child: Column(
-                children: <Widget>[
+                children: [
                   const Spacer(flex: 2),
                   const AuthHeader(
                     title: 'QuickNotes',
@@ -73,17 +73,40 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   AuthPrimaryButton(
                     label: 'Login',
-                    onPressed: () {
-                      // Handle Login logic
+                    onPressed: () async {
+                      final result = await AuthService().signInWithEmail(
+                        email: _emailController.text,
+                        password: _passwordController.text,
+                      );
+
+                      if (result != null) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(result)));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Login successful!')),
+                        );
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const CreateNoteScreen(),
+                          ),
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
-                  const SocialAuthRow(), // Added for consistency with Register
-                  const SizedBox(height: 20),
+
                   AuthFooter(
                     message: "Don't have an account? ",
                     actionLabel: 'Register',
-                    onTap: widget.onRegisterTap ?? () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const RegisterScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const Spacer(flex: 5),
                 ],

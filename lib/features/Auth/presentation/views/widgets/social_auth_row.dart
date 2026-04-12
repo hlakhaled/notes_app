@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/core/theme/app_color.dart';
 import 'package:notes_app/core/theme/app_styles.dart';
+import 'package:notes_app/features/Auth/data/services/auth_service.dart';
 
 class SocialAuthRow extends StatelessWidget {
   const SocialAuthRow({super.key});
@@ -14,10 +15,7 @@ class SocialAuthRow extends StatelessWidget {
             Expanded(child: Divider(color: AppColor.divider, thickness: 1)),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                'OR CONTINUE WITH',
-                style: AppStyles.dividerLabel,
-              ),
+              child: Text('OR CONTINUE WITH', style: AppStyles.dividerLabel),
             ),
             Expanded(child: Divider(color: AppColor.divider, thickness: 1)),
           ],
@@ -32,7 +30,9 @@ class SocialAuthRow extends StatelessWidget {
                 icon: const Text('G', style: AppStyles.googleLetter),
                 label: 'Google',
                 labelColor: AppColor.textPrimary,
-                onPressed: () {},
+                onPressed: () {
+                  AuthService().signInWithGoogle();
+                },
               ),
             ),
             const SizedBox(width: 12),
@@ -90,7 +90,10 @@ class _SocialButton extends StatelessWidget {
           children: <Widget>[
             icon,
             const SizedBox(width: 8),
-            Text(label, style: AppStyles.socialLabel.copyWith(color: labelColor)),
+            Text(
+              label,
+              style: AppStyles.socialLabel.copyWith(color: labelColor),
+            ),
           ],
         ),
       ),
