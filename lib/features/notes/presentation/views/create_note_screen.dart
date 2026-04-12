@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/core/theme/app_styles.dart';
+import 'package:notes_app/features/notes/presentation/manager/notes_cubit.dart';
+import 'package:notes_app/features/notes/presentation/views/notes_list_screen.dart';
 import 'package:notes_app/features/notes/presentation/views/widgets/input_field.dart';
 import 'package:notes_app/features/notes/presentation/views/widgets/primary_button.dart';
 import '../../data/models/note.dart';
 
 class CreateNoteScreen extends StatefulWidget {
-  const CreateNoteScreen({
-    super.key,
-    required this.onSaveNote,
-    required this.onViewNotes,
-  });
-
-  final ValueChanged<Note> onSaveNote;
-  final void Function(BuildContext context) onViewNotes;
+  const CreateNoteScreen({super.key});
 
   @override
   State<CreateNoteScreen> createState() => _CreateNoteScreenState();
@@ -40,7 +36,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
       return;
     }
 
-    widget.onSaveNote(
+    context.read<NotesCubit>().addNote(
       Note(title: title, content: content, createdAt: DateTime.now()),
     );
 
@@ -88,7 +84,13 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
               PrimaryButton(onPressed: _saveNote, label: 'Save Note'),
               const SizedBox(height: 18),
               TextButton(
-                onPressed: () => widget.onViewNotes(context),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const NotesListScreen(),
+                    ),
+                  );
+                },
                 child: const Text('View Notes', style: AppStyles.bodyText),
               ),
               const SizedBox(height: 8),
