@@ -1,11 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/core/theme/app_styles.dart';
-import '../../data/models/note.dart';
 
 class NoteDetailsScreen extends StatelessWidget {
   const NoteDetailsScreen({super.key, required this.note});
 
-  final Note note;
+  final QueryDocumentSnapshot note;
+
+  String _formatNoteDate(DateTime dateTime) {
+    final String month = dateTime.month.toString().padLeft(2, '0');
+    final String day = dateTime.day.toString().padLeft(2, '0');
+    final String year = dateTime.year.toString();
+    final String hour = dateTime.hour.toString().padLeft(2, '0');
+    final String minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$month/$day/$year $hour:$minute';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +35,12 @@ class NoteDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(note.title, style: AppStyles.noteDetailsTitle),
+            Text(note["title"], style: AppStyles.noteDetailsTitle),
             const SizedBox(height: 16),
-            Text(note.content, style: AppStyles.noteDetailsBody),
+            Text(note["content"], style: AppStyles.noteDetailsBody),
             const SizedBox(height: 22),
             Text(
-              'Created At: ${formatNoteDate(note.createdAt)}',
+              'Created At: ${note["createdAt"] != null ? _formatNoteDate((note["createdAt"] as Timestamp).toDate()) : "Date not available"}',
               style: AppStyles.noteDetailsMeta,
             ),
           ],

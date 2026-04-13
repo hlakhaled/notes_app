@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/core/theme/app_styles.dart';
 import 'package:notes_app/features/notes/data/models/note.dart';
@@ -10,7 +11,7 @@ class NoteTile extends StatelessWidget {
     required this.onDelete,
   });
 
-  final Note note;
+final QueryDocumentSnapshot note;
   final VoidCallback onTap;
   final VoidCallback onDelete;
 
@@ -28,10 +29,10 @@ class NoteTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(note.title, style: AppStyles.noteTitle),
+                  Text(note['title'], style: AppStyles.noteTitle),
                   const SizedBox(height: 4),
                   Text(
-                    note.content,
+                    note['content'],
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppStyles.noteContent,

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/core/theme/app_styles.dart';
-import 'package:notes_app/features/notes/presentation/manager/notes_cubit.dart';
+import 'package:notes_app/features/notes/data/services/database_service.dart';
 import 'package:notes_app/features/notes/presentation/views/notes_list_screen.dart';
 import 'package:notes_app/features/notes/presentation/views/widgets/input_field.dart';
 import 'package:notes_app/features/notes/presentation/views/widgets/primary_button.dart';
-import '../../data/models/note.dart';
 
 class CreateNoteScreen extends StatefulWidget {
   const CreateNoteScreen({super.key});
@@ -25,27 +23,29 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
     super.dispose();
   }
 
-  void _saveNote() {
-    final String title = _titleController.text.trim();
-    final String content = _contentController.text.trim();
+  void _saveNote() async {
+    String title = _titleController.text.trim();
+    String content = _contentController.text.trim();
 
-    if (title.isEmpty || content.isEmpty) {
+    if (title.isNotEmpty && content.isNotEmpty) {
+      try {
+        DatabaseService dbService = DatabaseService();
+
+        await dbService.addNote(title, content);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Note saved successfully!")),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title and content.')),
+        const SnackBar(content: Text("Please enter both a title and content")),
       );
-      return;
     }
-
-    context.read<NotesCubit>().addNote(
-      Note(title: title, content: content, createdAt: DateTime.now()),
-    );
-
-    _titleController.clear();
-    _contentController.clear();
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Note saved.')));
   }
 
   @override
@@ -85,10 +85,9 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
               const SizedBox(height: 18),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const NotesListScreen(),
-                    ),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotesListScreen()),
                   );
                 },
                 child: const Text('View Notes', style: AppStyles.bodyText),
